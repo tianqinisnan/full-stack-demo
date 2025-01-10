@@ -1,0 +1,7 @@
+node_modules
+**/node_modules
+.env
+
+# MongoDB
+mongodb/data/
+mongodb/log/
