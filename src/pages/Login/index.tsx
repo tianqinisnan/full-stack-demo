@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiService } from '../services/api';
-import styles from './LoginPage.module.css';
+import { apiService } from '@src/services/api';
+import styles from './style.module.css';
 
 const LoginPage: React.FC = () => {
   const [phone, setPhone] = useState('');

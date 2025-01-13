@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { apiService } from '../services/api';
-import { VerificationInput } from '../components/VerificationInput';
-import styles from './VerificationPage.module.css';
+import { apiService } from '@src/services/api';
+import { VerificationInput } from '@src/components/VerificationInput';
+import styles from './style.module.css';
+import { buildQuery } from '@src/types/route';
+import { userStorage } from '@src/utils/storage';
 
 const VerificationPage: React.FC = () => {
   const location = useLocation();
@@ -24,8 +26,21 @@ const VerificationPage: React.FC = () => {
 
   const handleVerify = async (vCode?: string) => {
     try {
-      await apiService.verifyCode(phone, vCode || code);
-      navigate('/home');
+      const response = await apiService.verifyCode(phone, vCode || code);
+      const { isNewUser, nickname } = response.data || {};
+      
+      // 存储手机号
+      userStorage.setPhone(phone);
+      
+      if (isNewUser) {
+        // 如果是新用户，跳转到设置昵称页面
+        const defaultNickname = `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+        navigate('/set-nickname', { state: { defaultNickname } });
+      } else {
+        // 如果是老用户，直接跳转到首页
+        const query = buildQuery({ nickname });
+        navigate(`/home?${query}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '验证失败');
     }

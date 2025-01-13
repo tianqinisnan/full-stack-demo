@@ -47,10 +47,25 @@ class ApiService {
   }
 
   // 验证验证码
-  async verifyCode(phone: string, code: string): Promise<ApiResponse> {
+  async verifyCode(phone: string, code: string): Promise<ApiResponse<{ isNewUser: boolean; nickname?: string }>> {
     return this.request('/api/verification/verify-code', {
       method: 'POST',
       body: JSON.stringify({ phone, code }),
+    });
+  }
+
+  // 更新昵称
+  async updateNickname(phone: string, nickname: string): Promise<ApiResponse> {
+    return this.request('/api/users/update-nickname', {
+      method: 'POST',
+      body: JSON.stringify({ phone, nickname }),
+    });
+  }
+
+  // 获取用户信息
+  async getUserInfo(phone: string): Promise<ApiResponse<{ nickname: string }>> {
+    return this.request(`/api/users/info?phone=${encodeURIComponent(phone)}`, {
+      method: 'GET',
     });
   }
 }

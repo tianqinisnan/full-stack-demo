@@ -1,16 +1,25 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
-import VerificationPage from '../pages/VerificationPage';
-import HomePage from '../pages/HomePage';
+import Login from '@src/pages/Login';
+import Verification from '@src/pages/Verification';
+import Home from '@src/pages/Home';
+import SetNickname from '@src/pages/SetNickname';
+import { userStorage } from '@src/utils/storage';
 
-export const AppRoutes: React.FC = () => {
+const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/verification" element={<VerificationPage />} />
-      <Route path="/home" element={<HomePage />} />
+      <Route path="/" element={
+        userStorage.isLoggedIn() 
+          ? <Navigate to="/home" replace /> 
+          : <Navigate to="/login" replace />
+      } />
+      <Route path="/login" element={<Login />} />
+      <Route path="/verification" element={<Verification />} />
+      <Route path="/set-nickname" element={<SetNickname />} />
+      <Route path="/home" element={<Home />} />
     </Routes>
   );
 };
+
+export default AppRoutes;

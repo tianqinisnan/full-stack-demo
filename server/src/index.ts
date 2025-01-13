@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { connectDB } from './config/db';
 import { verificationRoutes } from './routes/verification';
 import { eventRoutes } from './routes/event';
+import { userRoutes } from './routes/user';
 import { env } from './config/env';
 
 // 连接数据库
@@ -40,6 +41,7 @@ app.use(express.json());
 // 路由
 app.use('/api/verification', verificationRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
 
 // 错误处理中间件
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

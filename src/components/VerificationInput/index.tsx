@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './VerificationInput.module.css';
+import styles from './style.module.css';
 
 interface VerificationInputProps {
   length?: number;
