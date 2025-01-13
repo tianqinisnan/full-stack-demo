@@ -1,56 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { apiService } from '../services/api';
-
-const Container = styled.div`
-  padding: 20px;
-  max-width: 400px;
-  margin: 0 auto;
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  color: #333;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  height: 44px;
-  border: 1px solid #dcdee0;
-  border-radius: 8px;
-  padding: 0 15px;
-  font-size: 16px;
-  margin-bottom: 16px;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: #1989fa;
-    outline: none;
-  }
-`;
-
-const Button = styled.button`
-  width: 100%;
-  height: 44px;
-  background-color: #1989fa;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-
-  &:disabled {
-    background-color: #a0cfff;
-    cursor: not-allowed;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: #ff4d4f;
-  margin-bottom: 16px;
-  font-size: 14px;
-`;
+import styles from './LoginPage.module.css';
 
 const LoginPage: React.FC = () => {
   const [phone, setPhone] = useState('');
@@ -90,22 +41,24 @@ const LoginPage: React.FC = () => {
   const isPhoneValid = phone.length === 11;
 
   return (
-    <Container>
-      <Title>登录</Title>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      <Input
+    <div className={styles.container}>
+      <h2 className={styles.title}>登录</h2>
+      {error && <div className={styles.errorMessage}>{error}</div>}
+      <input
         type="tel"
         placeholder="请输入手机号"
         value={phone}
         onChange={handlePhoneChange}
+        className={styles.input}
       />
-      <Button
+      <button
         onClick={handleSendCode}
         disabled={!isPhoneValid || countdown > 0}
+        className={styles.button}
       >
         {countdown > 0 ? `${countdown}秒后重新发送` : '发送验证码'}
-      </Button>
-    </Container>
+      </button>
+    </div>
   );
 };
 
