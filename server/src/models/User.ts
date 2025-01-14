@@ -6,6 +6,7 @@ export interface IUser extends mongoose.Document {
   phone: string;
   nickname?: string;
   avatar?: string;
+  avatarUrl?: string;
   status: 'active' | 'inactive' | 'blocked';
   lastLoginAt?: Date;
   createdAt: Date;
@@ -33,6 +34,9 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     trim: true
+  },
+  avatarUrl: {
+    type: String
   },
   status: {
     type: String,

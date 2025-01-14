@@ -7,70 +7,71 @@ const generateDefaultNickname = (phone: string): string => {
 };
 
 // 更新用户昵称
-export const updateNickname = async (req: Request, res: Response): Promise<void> => {
+export const updateNickname = async (req: Request, res: Response) => {
+  const { phone, nickname } = req.body;
+
   try {
-    const { phone, nickname } = req.body;
-
-    if (!phone || !nickname) {
-      res.status(400).json({ message: '手机号和昵称不能为空' });
-      return;
-    }
-
-    const user = await User.findOneAndUpdate(
-      { phone },
-      { nickname },
-      { new: true }
-    );
-
+    const user = await User.findOne({ phone });
     if (!user) {
-      res.status(404).json({ message: '用户不存在' });
-      return;
+      return res.status(404).json({
+        success: false,
+        message: '用户不存在'
+      });
     }
 
-    res.json({ success: true, data: { nickname: user.nickname } });
+    user.nickname = nickname;
+    await user.save();
+
+    res.json({
+      success: true
+    });
   } catch (error) {
-    console.error('更新昵称失败:', error);
-    res.status(500).json({ message: '更新昵称失败' });
+    res.status(500).json({
+      success: false,
+      message: '更新昵称失败'
+    });
   }
 };
 
 // 获取用户信息
-export const getUserInfo = async (req: Request, res: Response): Promise<void> => {
+export const getUserInfo = async (req: Request, res: Response) => {
+  const { phone } = req.query;
+
   try {
-    const { phone } = req.query;
-
-    if (!phone) {
-      res.status(400).json({ message: '手机号不能为空' });
-      return;
-    }
-
-    let user = await User.findOne({ phone });
-
+    const user = await User.findOne({ phone });
     if (!user) {
-      res.status(404).json({ message: '用户不存在' });
-      return;
-    }
-
-    // 如果用户没有昵称，生成默认昵称并保存
-    if (!user.nickname) {
-      const defaultNickname = generateDefaultNickname(phone as string);
-      user = await User.findOneAndUpdate(
-        { phone },
-        { nickname: defaultNickname },
-        { new: true }
-      );
+      return res.status(404).json({
+        success: false,
+        message: '用户不存在'
+      });
     }
 
     res.json({
       success: true,
       data: {
-        nickname: user?.nickname,
-        avatar: user?.avatar,
-        status: user?.status
+        nickname: user.nickname
       }
     });
   } catch (error) {
-    console.error('获取用户信息失败:', error);
-    res.status(500).json({ message: '获取用户信息失败' });
+    res.status(500).json({
+      success: false,
+      message: '获取用户信息失败'
+    });
+  }
+};
+
+// 获取所有用户信息
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find({}, { phone: 1, nickname: 1, avatarUrl: 1, _id: 0 });
+    res.json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取用户列表失败'
+    });
   }
 }; 

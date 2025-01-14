@@ -2,8 +2,14 @@ import { env } from '../config/env';
 
 interface ApiResponse<T = any> {
   success: boolean;
-  data?: T;
   message?: string;
+  data?: T;
+}
+
+export interface UserInfo {
+  phone: string;
+  nickname: string;
+  avatarUrl?: string;
 }
 
 class ApiService {
@@ -65,6 +71,13 @@ class ApiService {
   // 获取用户信息
   async getUserInfo(phone: string): Promise<ApiResponse<{ nickname: string }>> {
     return this.request(`/api/users/info?phone=${encodeURIComponent(phone)}`, {
+      method: 'GET',
+    });
+  }
+
+  // 获取全部用户信息
+  async getAllUsers(): Promise<ApiResponse<UserInfo[]>> {
+    return this.request('/api/users/all', {
       method: 'GET',
     });
   }
