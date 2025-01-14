@@ -39,6 +39,18 @@ const ContactsPage: React.FC = () => {
     }
   };
 
+  // 处理用户点击
+  const handleUserClick = async (user: UserInfo) => {
+    try {
+      const response = await apiService.createOrGetConversation(user.phone);
+      if (response.success) {
+        navigate(`/chat/${user.phone}`);
+      }
+    } catch (error) {
+      console.error('创建会话失败:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -121,7 +133,11 @@ const ContactsPage: React.FC = () => {
                 >
                   <div className={styles.sectionHeader}>{section}</div>
                   {groupedUsers[section].map(user => (
-                    <div key={user.phone} className={styles.userItem}>
+                    <div 
+                      key={user.phone} 
+                      className={styles.userItem}
+                      onClick={() => handleUserClick(user)}
+                    >
                       <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={40} />
                       <div className={styles.userInfo}>
                         <div className={styles.nickname}>{user.nickname}</div>

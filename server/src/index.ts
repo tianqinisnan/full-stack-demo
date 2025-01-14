@@ -6,6 +6,7 @@ import { connectDB } from './config/db';
 import { verificationRoutes } from './routes/verification';
 import { eventRoutes } from './routes/event';
 import { userRoutes } from './routes/user';
+import { chatRoutes } from './routes/chat';
 import { env } from './config/env';
 
 // 连接数据库
@@ -18,22 +19,10 @@ const app = express();
 
 // 中间件
 app.use(cors({
-  origin: function(origin, callback) {
-    // 允许没有origin的请求（比如同源请求）
-    if (!origin) {
-      return callback(null, true);
-    }
-    // 使用正则表达式匹配所有localhost域名（http和https）
-    const localhostRegex = /^https?:\/\/localhost(:\d+)?$/;
-    if (localhostRegex.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('不允许的来源'));
-    }
-  },
+  origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-user-phone']
 }));
 app.use(morgan('dev'));
 app.use(express.json());
@@ -42,6 +31,7 @@ app.use(express.json());
 app.use('/api/verification', verificationRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 错误处理中间件
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
