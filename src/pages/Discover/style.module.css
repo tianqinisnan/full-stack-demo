@@ -1,0 +1,14 @@
+.container {
+  padding: 20px;
+  padding-bottom: 76px; /* TabBar height + padding */
+}
+
+.title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.content {
+  min-height: calc(100vh - 120px);
+} 

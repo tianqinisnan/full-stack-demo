@@ -107,6 +107,10 @@ npm start
 2. 不要提交 `mongodb/data` 和 `mongodb/log` 目录
 3. 生产环境部署时注意修改相关配置
 
+## 资源地址
+- [iconfont](https://www.iconfont.cn/)
+- [iconfont 图标库](https://at.alicdn.com/t/c/font_4810692_a2uulh7bvjq.js)
+
 ## License
 
 MIT 

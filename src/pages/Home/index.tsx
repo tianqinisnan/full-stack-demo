@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '@src/services/api';
 import { parseQuery } from '@src/types/route';
 import { userStorage } from '@src/utils/storage';
+import TabBar from '@src/components/TabBar';
 import styles from './style.module.css';
 
 const HomePage: React.FC = () => {
@@ -50,20 +51,23 @@ const HomePage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>欢迎来到首页</h1>
-      <p className={styles.welcome}>你好，{nickname || '用户'}！</p>
-      {nickname && (
-        <div className={styles.share}>
-          <p>分享这个页面：</p>
-          <input
-            type="text"
-            readOnly
-            value={shareUrl}
-            className={styles.shareInput}
-            onClick={e => (e.target as HTMLInputElement).select()}
-          />
-        </div>
-      )}
+      {/* <h1 className={styles.title}>欢迎来到首页</h1>
+      <div className={styles.content}>
+        <p className={styles.welcome}>你好，{nickname || '用户'}！</p>
+        {nickname && (
+          <div className={styles.share}>
+            <p>分享这个页面：</p>
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className={styles.shareInput}
+              onClick={e => (e.target as HTMLInputElement).select()}
+            />
+          </div>
+        )}
+      </div> */}
+      <TabBar />
     </div>
   );
 };
