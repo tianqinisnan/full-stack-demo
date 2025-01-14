@@ -15,10 +15,17 @@
 - `MongooseGuide.ts`: Mongoose 完整使用指南，包含常用操作和高级特性示例
 
 ### /api
-API 文档（待添加）
+[API 文档](./api/README.md) - 详细的后端接口文档，包含：
+- 用户认证接口
+- 用户信息接口
+- 接口参数和返回值说明
 
 ### /architecture
-架构设计文档（待添加）
+[架构设计文档](./architecture/README.md) - 前端架构设计文档，包含：
+- 目录结构说明
+- 页面路由设计
+- 状态管理方案
+- 数据流说明 
 
 ### /best-practices
 最佳实践文档（待添加）
