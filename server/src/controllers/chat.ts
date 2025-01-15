@@ -11,8 +11,18 @@ export const getConversations = async (req: Request, res: Response) => {
     // 获取所有会话
     const conversations = await Conversation.find({ userId: phone })
       .sort({ updatedAt: -1 })
-      .populate('lastMessage')
       .lean();
+
+    // 获取所有最后消息的ID
+    const lastMessageIds = conversations
+      .filter(conv => conv.lastMessage)
+      .map(conv => conv.lastMessage);
+
+    // 获取最后消息的详情
+    const lastMessages = await Message.find(
+      { messageId: { $in: lastMessageIds } }
+    ).lean();
+    const messageMap = new Map(lastMessages.map(msg => [msg.messageId, msg]));
 
     // 获取会话对象的用户信息
     const userIds = conversations.map(conv => conv.partnerId);
@@ -24,7 +34,7 @@ export const getConversations = async (req: Request, res: Response) => {
       userId: conv.partnerId,
       nickname: userMap.get(conv.partnerId)?.nickname || '未知用户',
       avatarUrl: userMap.get(conv.partnerId)?.avatarUrl,
-      lastMessage: conv.lastMessage,
+      lastMessage: conv.lastMessage ? messageMap.get(conv.lastMessage) : undefined,
       unreadCount: conv.unreadCount,
       updatedAt: conv.updatedAt
     }));
@@ -85,7 +95,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     await Conversation.findOneAndUpdate(
       { userId: phone, partnerId: receiverId },
       {
-        lastMessage: message._id,
+        lastMessage: message.messageId,
         $setOnInsert: { userId: phone, partnerId: receiverId }
       },
       { upsert: true, new: true }
@@ -95,7 +105,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     await Conversation.findOneAndUpdate(
       { userId: receiverId, partnerId: phone },
       {
-        lastMessage: message._id,
+        lastMessage: message.messageId,
         $inc: { unreadCount: 1 },
         $setOnInsert: { userId: receiverId, partnerId: phone }
       },
@@ -115,7 +125,7 @@ export const markMessageAsRead = async (req: Request, res: Response) => {
     const { phone } = req.user!;
     const { messageId } = req.params;
 
-    const message = await Message.findById(messageId);
+    const message = await Message.findOne({ messageId: parseInt(messageId) });
     if (!message) {
       return res.status(404).json({ success: false, message: '消息不存在' });
     }
@@ -126,7 +136,10 @@ export const markMessageAsRead = async (req: Request, res: Response) => {
     }
 
     // 更新消息状态
-    await Message.findByIdAndUpdate(messageId, { status: 'read' });
+    await Message.findOneAndUpdate(
+      { messageId: parseInt(messageId) },
+      { status: 'read' }
+    );
 
     // 更新会话的未读消息计数
     await Conversation.findOneAndUpdate(
@@ -153,19 +166,22 @@ export const createOrGetConversation = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: '用户不存在' });
     }
 
-    // 尝试查找现有会话
-    let conversation = await Conversation.findOne({
-      userId: phone,
-      partnerId: partnerId
-    }).populate('lastMessage');
+    // 尝试查找现有会话或创建新会话
+    const conversation = await Conversation.findOneAndUpdate(
+      { userId: phone, partnerId: partnerId },
+      { $setOnInsert: { unreadCount: 0 } },
+      { upsert: true, new: true }
+    ).lean();
 
-    // 如果会话不存在，创建新会话
-    if (!conversation) {
-      conversation = await Conversation.create({
-        userId: phone,
-        partnerId: partnerId,
-        unreadCount: 0
-      });
+    // 获取最后一条消息（如果存在）
+    let lastMessage = undefined;
+    if (conversation.lastMessage) {
+      const foundMessage = await Message.findOne({ 
+        messageId: conversation.lastMessage 
+      }).lean();
+      if (foundMessage) {
+        lastMessage = foundMessage;
+      }
     }
 
     // 获取会话对象的用户信息
@@ -173,7 +189,7 @@ export const createOrGetConversation = async (req: Request, res: Response) => {
       userId: conversation.partnerId,
       nickname: partner.nickname || '未知用户',
       avatarUrl: partner.avatarUrl,
-      lastMessage: conversation.lastMessage,
+      lastMessage,
       unreadCount: conversation.unreadCount,
       updatedAt: conversation.updatedAt
     };

@@ -47,6 +47,7 @@
   display: flex;
   align-items: flex-start;
   margin-bottom: 16px;
+  flex-direction: row;
 }
 
 .messageItem.self {
@@ -56,6 +57,8 @@
 .messageContent {
   max-width: 70%;
   margin: 0 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .messageText {
@@ -65,10 +68,13 @@
   font-size: 16px;
   line-height: 1.4;
   word-break: break-all;
+  border-top-left-radius: 0;
 }
 
 .self .messageText {
   background-color: #95ec69;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 0;
 }
 
 .messageTime {
@@ -77,6 +83,10 @@
   margin-top: 4px;
   display: flex;
   align-items: center;
+}
+
+.messageItem .messageTime {
+  justify-content: flex-start;
 }
 
 .self .messageTime {

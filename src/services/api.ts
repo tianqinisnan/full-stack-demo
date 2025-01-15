@@ -14,7 +14,7 @@ export interface UserInfo {
 }
 
 export interface Message {
-  id: string;
+  messageId: number;
   senderId: string;
   receiverId: string;
   content: string;

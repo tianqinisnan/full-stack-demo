@@ -12,6 +12,7 @@ const ChatRoom: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [nickname, setNickname] = useState('');
+  const [selfNickname, setSelfNickname] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +28,25 @@ const ChatRoom: React.FC = () => {
         const response = await apiService.getMessages(id);
         if (response.success && response.data) {
           setMessages(response.data);
+          // 标记所有未读消息为已读
+          const unreadMessages = response.data.filter(
+            msg => msg.receiverId === phone && msg.status !== 'read'
+          );
+          for (const msg of unreadMessages) {
+            await apiService.markMessageAsRead(msg.messageId.toString());
+          }
         }
 
         // 获取聊天对象的用户信息
         const userResponse = await apiService.getUserInfo(id);
         if (userResponse.success && userResponse.data) {
           setNickname(userResponse.data.nickname);
+        }
+
+        // 获取自己的用户信息
+        const selfResponse = await apiService.getUserInfo(phone);
+        if (selfResponse.success && selfResponse.data) {
+          setSelfNickname(selfResponse.data.nickname);
         }
       } catch (error) {
         console.error('获取消息失败:', error);
@@ -59,8 +73,9 @@ const ChatRoom: React.FC = () => {
   const handleSend = async () => {
     if (!inputValue.trim() || !id) return;
 
+    const tempId = Date.now();
     const newMessage: Message = {
-      id: Date.now().toString(),
+      messageId: tempId, // 临时ID
       senderId: userStorage.getPhone() || '',
       receiverId: id,
       content: inputValue.trim(),
@@ -77,12 +92,21 @@ const ChatRoom: React.FC = () => {
     try {
       const response = await apiService.sendMessage(id, newMessage.content);
       if (response.success && response.data) {
-        // 更新消息状态为已发送
+        // 确保返回的数据符合Message接口
+        const serverMessage: Message = {
+          messageId: response.data.messageId,
+          senderId: response.data.senderId,
+          receiverId: response.data.receiverId,
+          content: response.data.content,
+          type: response.data.type,
+          status: 'sent',
+          createdAt: response.data.createdAt
+        };
+        
+        // 更新消息状态为已发送，使用服务器返回的消息
         setMessages(prev => 
           prev.map(msg => 
-            msg.id === newMessage.id 
-              ? { ...msg, ...response.data, status: 'sent' as const }
-              : msg
+            msg.messageId === tempId ? serverMessage : msg
           )
         );
       }
@@ -91,7 +115,7 @@ const ChatRoom: React.FC = () => {
       // 更新消息状态为发送失败
       setMessages(prev =>
         prev.map(msg =>
-          msg.id === newMessage.id
+          msg.messageId === tempId
             ? { ...msg, status: 'failed' as const }
             : msg
         )
@@ -125,10 +149,11 @@ const ChatRoom: React.FC = () => {
               const isSelf = message.senderId === userStorage.getPhone();
               return (
                 <div
-                  key={message.id}
+                  key={message.messageId}
                   className={`${styles.messageItem} ${isSelf ? styles.self : ''}`}
                 >
                   {!isSelf && <Avatar nickname={nickname} size={40} />}
+                  {isSelf && <Avatar nickname={selfNickname} size={40} />}
                   <div className={styles.messageContent}>
                     <div className={styles.messageText}>{message.content}</div>
                     <div className={styles.messageTime}>
@@ -143,7 +168,6 @@ const ChatRoom: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  {isSelf && <Avatar nickname={userStorage.getPhone() || ''} size={40} />}
                 </div>
               );
             })}

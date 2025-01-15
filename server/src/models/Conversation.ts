@@ -1,10 +1,9 @@
-import { Schema, model, Types } from 'mongoose';
-import { IMessage } from './message';
+import { Schema, model, Document } from 'mongoose';
 
-export interface IConversation {
+export interface IConversation extends Document {
   userId: string;
   partnerId: string;
-  lastMessage?: Types.ObjectId | IMessage;
+  lastMessage?: number;
   unreadCount: number;
   updatedAt: Date;
   createdAt: Date;
@@ -14,7 +13,7 @@ const conversationSchema = new Schema<IConversation>(
   {
     userId: { type: String, required: true },
     partnerId: { type: String, required: true },
-    lastMessage: { type: Schema.Types.ObjectId, ref: 'Message' },
+    lastMessage: { type: Number, ref: 'Message' },
     unreadCount: { type: Number, default: 0 }
   },
   { timestamps: true }
