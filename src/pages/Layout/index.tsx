@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '@src/components/Header';
 import Footer from '@src/components/Footer';
+import SocketManager from '@src/components/SocketManager';
 import { routes, RouteConfig } from '@src/routes';
 import styles from './style.module.css';
 
@@ -29,6 +30,7 @@ const Layout: React.FC = () => {
 
   return (
     <div className={styles.layout}>
+      <SocketManager />
       {currentRoute.header && <Header title={currentRoute.title} />}
       <main className={`${styles.main} ${currentRoute.header ? styles.hasHeader : ''} ${currentRoute.footer ? styles.hasFooter : ''}`}>
         <Outlet />

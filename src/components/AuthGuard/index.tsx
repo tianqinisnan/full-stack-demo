@@ -14,14 +14,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // 检查是否是公开路由
-  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
-
-  // 如果是公开路由，直接显示内容
-  if (isPublicRoute) {
-    return <>{children}</>;
-  }
-
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -41,6 +33,9 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     checkAuth();
   }, [location.pathname]);
 
+  // 检查是否是公开路由
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+
   // 如果正在检查认证状态，显示加载状态
   if (isChecking) {
     return (
@@ -55,13 +50,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     );
   }
 
-  // 如果未登录且不是公开路由，重定向到登录页
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  // 如果是公开路由或已认证，显示内容
+  if (isPublicRoute || isAuthenticated) {
+    return <>{children}</>;
   }
 
-  // 已登录，显示受保护的路由内容
-  return <>{children}</>;
+  // 未登录且不是公开路由，重定向到登录页
+  return <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 export default AuthGuard; 

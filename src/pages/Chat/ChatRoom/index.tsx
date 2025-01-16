@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Avatar from '@src/components/Avatar';
 import { apiService, Message } from '@src/services/api';
 import { userStorage } from '@src/utils/storage';
-import { socketService, EventType } from '@src/services/socket';
+import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 import Toast from '@src/components/Toast';
 import styles from './style.module.css';
 
@@ -55,21 +55,17 @@ const ChatRoom: React.FC = () => {
   };
 
   useEffect(() => {
-
     fetchMessages();
 
-    // 连接 WebSocket
-    socketService.connect();
-
-    // 监听新消息
-    const unsubscribeMessage = socketService.onNewMessage((data) => {
-      if (data.message.senderId === id || data.message.receiverId === id) {
+    // 订阅新消息事件
+    const unsubscribeMessage = eventBus.subscribe(EVENT_NAMES.NEW_MESSAGE, (message) => {
+      if (message.senderId === id || message.receiverId === id) {
         fetchMessages();
       }
     });
 
-    // 监听消息已读状态
-    const unsubscribeRead = socketService.onMessageRead((data) => {
+    // 订阅消息已读状态事件
+    const unsubscribeRead = eventBus.subscribe(EVENT_NAMES.MESSAGE_READ, (data) => {
       if (data.reader.phone === id) {
         setMessages(prev => 
           prev.map(msg => 
@@ -85,7 +81,7 @@ const ChatRoom: React.FC = () => {
       unsubscribeMessage();
       unsubscribeRead();
     };
-  }, [id, navigate]);
+  }, [id, fetchMessages]);
 
   useEffect(() => {
     scrollToBottom();

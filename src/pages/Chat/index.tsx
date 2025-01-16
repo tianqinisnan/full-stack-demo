@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@src/components/Avatar';
 import TabBar from '@src/components/TabBar';
 import { apiService, Conversation } from '@src/services/api';
 import { userStorage } from '@src/utils/storage';
-import { socketService, EventType } from '@src/services/socket';
-import Toast from '@src/components/Toast';
+import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 import styles from './style.module.css';
 
 const ChatPage: React.FC = () => {
@@ -13,7 +12,7 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       const response = await apiService.getConversations();
       if (response.success && response.data) {
@@ -24,28 +23,22 @@ const ChatPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const phone = userStorage.getPhone() || '';
 
     fetchConversations();
 
-    // 连接 WebSocket
-    socketService.connect();
-
-    // 监听新消息
-    const unsubscribeMessage = socketService.onNewMessage((data) => {
-      if (data.message.receiverId === phone) {
-        Toast.show('新消息来了～');
-        fetchConversations();
-      }
+    // 订阅新消息事件
+    const unsubscribe = eventBus.subscribe(EVENT_NAMES.NEW_MESSAGE, () => {
+      fetchConversations();
     });
 
     return () => {
-      unsubscribeMessage();
+      unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, fetchConversations]);
 
   // 格式化最后消息时间
   const formatTime = (dateStr: string) => {
