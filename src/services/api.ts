@@ -1,3 +1,4 @@
+import Toast from '@src/components/Toast';
 import { env } from '../config/env';
 import { userStorage } from '@src/utils/storage';
 
@@ -32,11 +33,18 @@ export interface Conversation {
   updatedAt: string;
 }
 
+type NavigateFunction = (path: string) => void;
+
 class ApiService {
   private baseURL: string;
+  private navigateCallback?: NavigateFunction;
 
   constructor() {
     this.baseURL = env.api.baseURL;
+  }
+
+  setNavigate(navigate: NavigateFunction) {
+    this.navigateCallback = navigate;
   }
 
   private async request<T>(
@@ -58,6 +66,11 @@ class ApiService {
 
       if (!response.ok) {
         throw new Error(data.message || '请求失败');
+      }
+
+      if (data.code === 401) {
+        Toast.show('未登录');
+        this.navigateCallback?.('/login');
       }
 
       return data;

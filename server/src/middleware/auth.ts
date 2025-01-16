@@ -15,7 +15,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
   const phone = req.headers['x-user-phone'];
 
   if (!phone || typeof phone !== 'string') {
-    return res.status(401).json({ success: false, message: '未登录' });
+    return res.status(200).json({ success: false, message: '未登录', code: 401 });
   }
 
   req.user = { phone };

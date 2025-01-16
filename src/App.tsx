@@ -1,13 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { NavigationProvider } from './contexts/NavigationContext';
 import AppRoutes from './routes';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <BrowserRouter>
+      <NavigationProvider>
+        <AppRoutes />
+      </NavigationProvider>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
