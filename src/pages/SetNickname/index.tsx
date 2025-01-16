@@ -12,12 +12,7 @@ const SetNicknamePage: React.FC = () => {
   const [nickname, setNickname] = useState(defaultNickname || '');
   const [error, setError] = useState('');
 
-  const phone = userStorage.getPhone();
-  
-  if (!phone) {
-    navigate('/login');
-    return null;
-  }
+  const phone = userStorage.getPhone() || '';
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);

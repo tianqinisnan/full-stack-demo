@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { Message, IMessage } from '../models/message';
-import { Conversation } from '../models/conversation';
+import { Conversation } from '../models/Conversation';
 import { User } from '../models/User';
+import { sendNewMessageNotification, sendMessageReadNotification } from '../services/websocket';
 
 // 获取会话列表
 export const getConversations = async (req: Request, res: Response) => {
@@ -112,6 +113,20 @@ export const sendMessage = async (req: Request, res: Response) => {
       { upsert: true }
     );
 
+    // 发送实时通知
+    sendNewMessageNotification(receiverId, {
+      message: {
+        messageId: message.messageId,
+        senderId: message.senderId,
+        receiverId: message.receiverId,
+        content: message.content,
+        type: message.type,
+        status: message.status,
+        createdAt: message.createdAt.toISOString()
+      },
+      sender: { phone }
+    });
+
     res.json({ success: true, data: message });
   } catch (error) {
     console.error('发送消息失败:', error);
@@ -146,6 +161,12 @@ export const markMessageAsRead = async (req: Request, res: Response) => {
       { userId: phone, partnerId: message.senderId },
       { unreadCount: 0 }
     );
+
+    // 发送已读通知
+    sendMessageReadNotification(message.senderId, {
+      messageId: message.messageId,
+      reader: { phone }
+    });
 
     res.json({ success: true });
   } catch (error) {

@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import { createServer } from 'http';
 import { connectDB } from './config/db';
 import { verificationRoutes } from './routes/verification';
 import { eventRoutes } from './routes/event';
 import { userRoutes } from './routes/user';
 import { chatRoutes } from './routes/chat';
 import { env } from './config/env';
+import { initializeWebSocket } from './services/websocket';
 
 // 连接数据库
 connectDB().catch(err => {
@@ -16,6 +18,10 @@ connectDB().catch(err => {
 });
 
 const app = express();
+const server = createServer(app);
+
+// 初始化 WebSocket
+initializeWebSocket(server);
 
 // 中间件
 app.use(cors({
@@ -51,6 +57,6 @@ process.on('SIGINT', async () => {
   }
 });
 
-app.listen(env.server.port, () => {
+server.listen(env.server.port, () => {
   console.log(`服务器运行在 http://${env.server.host}:${env.server.port}`);
 }); 

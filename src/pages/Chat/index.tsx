@@ -4,6 +4,8 @@ import Avatar from '@src/components/Avatar';
 import TabBar from '@src/components/TabBar';
 import { apiService, Conversation } from '@src/services/api';
 import { userStorage } from '@src/utils/storage';
+import { socketService, EventType } from '@src/services/socket';
+import Toast from '@src/components/Toast';
 import styles from './style.module.css';
 
 const ChatPage: React.FC = () => {
@@ -11,27 +13,38 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
-  useEffect(() => {
-    const phone = userStorage.getPhone();
-    if (!phone) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchConversations = async () => {
-      try {
-        const response = await apiService.getConversations();
-        if (response.success && response.data) {
-          setConversations(response.data);
-        }
-      } catch (error) {
-        console.error('获取会话列表失败:', error);
-      } finally {
-        setLoading(false);
+  const fetchConversations = async () => {
+    try {
+      const response = await apiService.getConversations();
+      if (response.success && response.data) {
+        setConversations(response.data);
       }
-    };
+    } catch (error) {
+      console.error('获取会话列表失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const phone = userStorage.getPhone() || '';
 
     fetchConversations();
+
+    // 连接 WebSocket
+    socketService.connect();
+
+    // 监听新消息
+    const unsubscribeMessage = socketService.onNewMessage((data) => {
+      if (data.message.receiverId === phone) {
+        Toast.show('新消息来了～');
+        fetchConversations();
+      }
+    });
+
+    return () => {
+      unsubscribeMessage();
+    };
   }, [navigate]);
 
   // 格式化最后消息时间

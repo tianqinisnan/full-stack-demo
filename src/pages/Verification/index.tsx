@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '@src/services/api';
 import { VerificationInput } from '@src/components/VerificationInput';
@@ -14,10 +14,11 @@ const VerificationPage: React.FC = () => {
 
   const phone = location.state?.phone;
 
-  if (!phone) {
-    navigate('/login');
-    return null;
-  }
+  useEffect(() => {
+    if (!phone) {
+      navigate('/login');
+    }
+  }, [phone]);
 
   const handleCodeChange = (value: string) => {
     setCode(value);

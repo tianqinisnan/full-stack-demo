@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Avatar from '@src/components/Avatar';
 import { apiService, Message } from '@src/services/api';
 import { userStorage } from '@src/utils/storage';
+import { socketService, EventType } from '@src/services/socket';
+import Toast from '@src/components/Toast';
 import styles from './style.module.css';
 
 const ChatRoom: React.FC = () => {
@@ -16,46 +18,73 @@ const ChatRoom: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const phone = userStorage.getPhone();
-    if (!phone || !id) {
-      navigate('/login');
-      return;
-    }
+  const phone = userStorage.getPhone() || '';
 
-    const fetchMessages = async () => {
-      try {
-        const response = await apiService.getMessages(id);
-        if (response.success && response.data) {
-          setMessages(response.data);
-          // 标记所有未读消息为已读
-          const unreadMessages = response.data.filter(
-            msg => msg.receiverId === phone && msg.status !== 'read'
-          );
-          for (const msg of unreadMessages) {
-            await apiService.markMessageAsRead(msg.messageId.toString());
-          }
-        }
+  const fetchMessages = async () => {
+    try {
+      if (!phone || !id) return;
 
-        // 获取聊天对象的用户信息
-        const userResponse = await apiService.getUserInfo(id);
-        if (userResponse.success && userResponse.data) {
-          setNickname(userResponse.data.nickname);
+      const response = await apiService.getMessages(id);
+      if (response.success && response.data) {
+        setMessages(response.data);
+        // 标记所有未读消息为已读
+        const unreadMessages = response.data.filter(
+          msg => msg.receiverId === phone && msg.status !== 'read'
+        );
+        for (const msg of unreadMessages) {
+          await apiService.markMessageAsRead(msg.messageId.toString());
         }
-
-        // 获取自己的用户信息
-        const selfResponse = await apiService.getUserInfo(phone);
-        if (selfResponse.success && selfResponse.data) {
-          setSelfNickname(selfResponse.data.nickname);
-        }
-      } catch (error) {
-        console.error('获取消息失败:', error);
-      } finally {
-        setLoading(false);
       }
-    };
+
+      // 获取聊天对象的用户信息
+      const userResponse = await apiService.getUserInfo(id);
+      if (userResponse.success && userResponse.data) {
+        setNickname(userResponse.data.nickname);
+      }
+
+      // 获取自己的用户信息
+      const selfResponse = await apiService.getUserInfo(phone);
+      if (selfResponse.success && selfResponse.data) {
+        setSelfNickname(selfResponse.data.nickname);
+      }
+    } catch (error) {
+      console.error('获取消息失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
 
     fetchMessages();
+
+    // 连接 WebSocket
+    socketService.connect();
+
+    // 监听新消息
+    const unsubscribeMessage = socketService.onNewMessage((data) => {
+      if (data.message.senderId === id || data.message.receiverId === id) {
+        fetchMessages();
+      }
+    });
+
+    // 监听消息已读状态
+    const unsubscribeRead = socketService.onMessageRead((data) => {
+      if (data.reader.phone === id) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.messageId === data.messageId
+              ? { ...msg, status: 'read' as const }
+              : msg
+          )
+        );
+      }
+    });
+
+    return () => {
+      unsubscribeMessage();
+      unsubscribeRead();
+    };
   }, [id, navigate]);
 
   useEffect(() => {
@@ -76,7 +105,7 @@ const ChatRoom: React.FC = () => {
     const tempId = Date.now();
     const newMessage: Message = {
       messageId: tempId, // 临时ID
-      senderId: userStorage.getPhone() || '',
+      senderId: phone,
       receiverId: id,
       content: inputValue.trim(),
       type: 'text',
@@ -146,7 +175,7 @@ const ChatRoom: React.FC = () => {
         ) : (
           <>
             {messages.map(message => {
-              const isSelf = message.senderId === userStorage.getPhone();
+              const isSelf = message.senderId === phone;
               return (
                 <div
                   key={message.messageId}

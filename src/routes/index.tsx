@@ -15,7 +15,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={
-        userStorage.isLoggedIn() 
+        userStorage.isLoggedIn()
           ? <Navigate to="/home" replace /> 
           : <Navigate to="/login" replace />
       } />

@@ -8,23 +8,16 @@ import styles from './style.module.css';
 
 const HomePage: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [nickname, setNickname] = useState<string>('');
   
   // 从 storage 获取手机号
-  const phone = userStorage.getPhone();
+  const phone = userStorage.getPhone() || '';
   
   // 从 URL 获取可分享信息
   const query = parseQuery(location.search);
   const urlNickname = query.nickname;
 
   useEffect(() => {
-    // 没有手机号，说明未登录
-    if (!phone) {
-      navigate('/login', { replace: true });
-      return;
-    }
-    
     // 如果有 URL 中的昵称参数，直接使用
     if (urlNickname) {
       setNickname(urlNickname);
@@ -44,7 +37,7 @@ const HomePage: React.FC = () => {
     };
 
     fetchUserInfo();
-  }, [phone, urlNickname, navigate]);
+  }, [phone, urlNickname]);
 
   // 生成分享链接
   const shareUrl = `${window.location.origin}/home?nickname=${encodeURIComponent(nickname)}`;

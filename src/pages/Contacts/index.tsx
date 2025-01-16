@@ -20,11 +20,7 @@ const ContactsPage: React.FC = () => {
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // 检查登录状态
-  const phone = userStorage.getPhone();
-  if (!phone) {
-    navigate('/login');
-    return null;
-  }
+  const phone = userStorage.getPhone() || '';
 
   // 获取昵称的首字母（大写）
   const getInitial = (nickname: string): string => {
