@@ -1,0 +1,18 @@
+.layout {
+  min-height: 100vh;
+  background-color: #f7f7f7;
+}
+
+.main {
+  min-height: 100vh;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.hasHeader {
+  padding-top: 56px;
+}
+
+.hasFooter {
+  padding-bottom: 68px;
+} 

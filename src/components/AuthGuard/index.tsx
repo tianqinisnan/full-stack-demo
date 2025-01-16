@@ -14,9 +14,20 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // 检查是否是公开路由
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+
+  // 如果是公开路由，直接显示内容
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setIsChecking(true);
+        // 添加50ms延时，确保localStorage的读取是最新的
+        await new Promise(resolve => setTimeout(resolve, 50));
         const isLoggedIn = userStorage.isLoggedIn();
         setIsAuthenticated(isLoggedIn);
       } catch (error) {
@@ -28,10 +39,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     };
 
     checkAuth();
-  }, []);
-
-  // 检查是否是公开路由
-  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+  }, [location.pathname]);
 
   // 如果正在检查认证状态，显示加载状态
   if (isChecking) {
@@ -45,11 +53,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         加载中...
       </div>
     );
-  }
-
-  // 如果是公开路由，直接显示
-  if (isPublicRoute) {
-    return <>{children}</>;
   }
 
   // 如果未登录且不是公开路由，重定向到登录页
