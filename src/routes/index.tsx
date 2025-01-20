@@ -65,7 +65,7 @@ export const routes = [
         element: <Chat />,
         title: '消息',
         header: true,
-        footer: true,
+        footer: false,
       },
       {
         path: 'chat/:id',
@@ -90,7 +90,7 @@ export const routes = [
         path: 'set-nickname',
         element: <SetNickname />,
         title: '设置昵称',
-        header: true,
+        header: false,
         footer: false,
       },
       {

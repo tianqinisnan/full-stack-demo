@@ -81,7 +81,7 @@ const ChatRoom: React.FC = () => {
       unsubscribeMessage();
       unsubscribeRead();
     };
-  }, [id, fetchMessages]);
+  }, [id]);
 
   useEffect(() => {
     scrollToBottom();

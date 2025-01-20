@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Avatar from '@src/components/Avatar';
 import TabBar from '@src/components/TabBar';
 import { apiService, Conversation } from '@src/services/api';
-import { userStorage } from '@src/utils/storage';
 import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 import styles from './style.module.css';
 
@@ -26,8 +25,6 @@ const ChatPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const phone = userStorage.getPhone() || '';
-
     fetchConversations();
 
     // 订阅新消息事件
@@ -38,7 +35,7 @@ const ChatPage: React.FC = () => {
     return () => {
       unsubscribe();
     };
-  }, [navigate, fetchConversations]);
+  }, []);
 
   // 格式化最后消息时间
   const formatTime = (dateStr: string) => {
