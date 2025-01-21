@@ -1,5 +1,4 @@
 import React from 'react';
-import TabBar from '@src/components/TabBar';
 import styles from './style.module.css';
 
 const DiscoverPage: React.FC = () => {
@@ -9,7 +8,6 @@ const DiscoverPage: React.FC = () => {
       <div className={styles.content}>
         {/* 发现页内容 */}
       </div>
-      <TabBar />
     </div>
   );
 };

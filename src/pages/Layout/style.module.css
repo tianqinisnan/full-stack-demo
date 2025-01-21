@@ -1,18 +1,21 @@
 .layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   min-height: 100vh;
   background-color: #f7f7f7;
 }
 
 .main {
-  min-height: 100vh;
-  padding: 12px;
-  box-sizing: border-box;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.hasHeader {
-  padding-top: 56px;
+.headerPlaceholder {
+  height: 44px;
+  min-height: 44px;
 }
-
-.hasFooter {
-  padding-bottom: 68px;
-} 
+.footerPlaceholder{
+  height: 56px;
+  min-height: 56px;
+}

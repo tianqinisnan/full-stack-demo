@@ -6,9 +6,9 @@ import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 
 const SocketManager = () => {
   const isConnected = useRef(false);
+  const phone = userStorage.getPhone();
 
   useEffect(() => {
-    const phone = userStorage.getPhone();
     if (!phone || isConnected.current) return;
 
     isConnected.current = true;
@@ -34,7 +34,7 @@ const SocketManager = () => {
       unsubscribeRead();
       isConnected.current = false;
     };
-  }, []);
+  }, [phone]);
 
   return null;
 };

@@ -158,13 +158,6 @@ const ChatRoom: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.backButton} onClick={handleBack}>
-          返回
-        </div>
-        <div className={styles.title}>{nickname}</div>
-      </div>
-
       <div className={styles.messageList} ref={messageListRef}>
         {loading ? (
           <div className={styles.loading}>加载中...</div>

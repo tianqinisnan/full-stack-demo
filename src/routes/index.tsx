@@ -1,9 +1,8 @@
 import React from 'react';
-import { useRoutes } from 'react-router-dom';
+import { useRoutes, Navigate } from 'react-router-dom';
 import AuthGuard from '@src/components/AuthGuard';
 import Layout from '@src/pages/Layout';
 import Login from '@src/pages/Login';
-import Verification from '@src/pages/Verification';
 import SetNickname from '@src/pages/SetNickname';
 import Home from '@src/pages/Home';
 import Contacts from '@src/pages/Contacts';
@@ -11,6 +10,7 @@ import Discover from '@src/pages/Discover';
 import Me from '@src/pages/Me';
 import Chat from '@src/pages/Chat';
 import ChatRoom from '@src/pages/Chat/ChatRoom';
+import NotFound from '@src/pages/NotFound';
 
 export interface RouteConfig {
   path: string;
@@ -27,10 +27,7 @@ export const routes = [
     children: [
       {
         path: '',
-        element: <Home />,
-        title: '首页',
-        header: true,
-        footer: true,
+        element: <Navigate to="/home" replace />,
       },
       {
         path: 'home',
@@ -81,12 +78,6 @@ export const routes = [
         footer: false,
       },
       {
-        path: 'verification',
-        element: <Verification />,
-        header: false,
-        footer: false,
-      },
-      {
         path: 'set-nickname',
         element: <SetNickname />,
         title: '设置昵称',
@@ -95,10 +86,10 @@ export const routes = [
       },
       {
         path: '*',
-        element: <Home />,
-        title: '首页',
-        header: true,
-        footer: true,
+        element: <NotFound />,
+        title: '404',
+        header: false,
+        footer: false,
       }
     ]
   }

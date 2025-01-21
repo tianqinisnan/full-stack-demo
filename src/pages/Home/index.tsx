@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '@src/services/api';
 import { parseQuery } from '@src/types/route';
 import { userStorage } from '@src/utils/storage';
-import TabBar from '@src/components/TabBar';
 import styles from './style.module.css';
 
 const HomePage: React.FC = () => {
@@ -60,7 +59,6 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </div> */}
-      <TabBar />
     </div>
   );
 };

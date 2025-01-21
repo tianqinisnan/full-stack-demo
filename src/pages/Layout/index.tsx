@@ -31,11 +31,21 @@ const Layout: React.FC = () => {
   return (
     <div className={styles.layout}>
       <SocketManager />
-      {currentRoute.header && <Header title={currentRoute.title} />}
-      <main className={`${styles.main} ${currentRoute.header ? styles.hasHeader : ''} ${currentRoute.footer ? styles.hasFooter : ''}`}>
+      {currentRoute.header && (
+        <>
+          <Header title={currentRoute.title} />
+          <div className={styles.headerPlaceholder} />
+        </>
+      )}
+      <main className={styles.main}>
         <Outlet />
       </main>
-      {currentRoute.footer && <Footer />}
+      {currentRoute.footer && (
+        <>
+          <Footer />
+          <div className={styles.footerPlaceholder} />
+        </>
+      )}
     </div>
   );
 };

@@ -4,7 +4,6 @@ import { apiService, UserInfo } from '@src/services/api';
 import { userStorage } from '@src/utils/storage';
 import { getFirstPinyin, getFullPinyin } from '@src/utils/pinyin';
 import Avatar from '@src/components/Avatar';
-import TabBar from '@src/components/TabBar';
 import styles from './style.module.css';
 
 interface GroupedUsers {
@@ -109,55 +108,49 @@ const ContactsPage: React.FC = () => {
     fetchUsers();
   }, [phone]);
 
+
+  if (loading) {
+    return (
+      <div className={styles.loading}>加载中...</div>
+    );
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        通讯录
-        <div className={styles.addContact}>+</div>
-      </div>
-      <div className={styles.content}>
-        {loading ? (
-          <div className={styles.loading}>加载中...</div>
-        ) : (
-          <>
-            <div className={styles.userList}>
-              {sections.map(section => (
-                <div 
-                  key={section}
-                  ref={el => sectionRefs.current[section] = el}
-                  className={styles.section}
-                >
-                  <div className={styles.sectionHeader}>{section}</div>
-                  {groupedUsers[section].map(user => (
-                    <div 
-                      key={user.phone} 
-                      className={styles.userItem}
-                      onClick={() => handleUserClick(user)}
-                    >
-                      <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={40} />
-                      <div className={styles.userInfo}>
-                        <div className={styles.nickname}>{user.nickname}</div>
-                      </div>
-                    </div>
-                  ))}
+      <div className={styles.userList}>
+        {sections.map(section => (
+          <div 
+            key={section}
+            ref={el => sectionRefs.current[section] = el}
+            className={styles.section}
+          >
+            <div className={styles.sectionHeader}>{section}</div>
+            {groupedUsers[section].map(user => (
+              <div 
+                key={user.phone} 
+                className={styles.userItem}
+                onClick={() => handleUserClick(user)}
+              >
+                <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={40} />
+                <div className={styles.userInfo}>
+                  <div className={styles.nickname}>{user.nickname}</div>
                 </div>
-              ))}
-            </div>
-            <div className={styles.quickJump}>
-              {sections.map(section => (
-                <div
-                  key={section}
-                  className={styles.quickJumpItem}
-                  onClick={() => handleQuickJump(section)}
-                >
-                  {section}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
-      <TabBar />
+      <div className={styles.quickJump}>
+        {sections.map(section => (
+          <div
+            key={section}
+            className={styles.quickJumpItem}
+            onClick={() => handleQuickJump(section)}
+          >
+            {section}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

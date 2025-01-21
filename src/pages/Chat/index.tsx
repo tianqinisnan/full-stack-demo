@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@src/components/Avatar';
-import TabBar from '@src/components/TabBar';
 import { apiService, Conversation } from '@src/services/api';
 import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 import styles from './style.module.css';
@@ -69,49 +68,43 @@ const ChatPage: React.FC = () => {
     navigate(`/chat/${conversation.userId}`);
   };
 
+  if (loading) {
+    return (
+      <div className={styles.loading}>加载中...</div>
+    );
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        消息列表
-      </div>
-      
-      <div className={styles.content}>
-        {loading ? (
-          <div className={styles.loading}>加载中...</div>
-        ) : (
-          <div className={styles.conversationList}>
-            {conversations.map(conversation => (
-              <div 
-                key={conversation.userId}
-                className={styles.conversationItem}
-                onClick={() => handleClick(conversation)}
-              >
-                <Avatar nickname={conversation.nickname} size={48} />
-                
-                <div className={styles.conversationInfo}>
-                  <div className={styles.conversationHeader}>
-                    <span className={styles.nickname}>{conversation.nickname}</span>
-                    <span className={styles.time}>
-                      {conversation.lastMessage && formatTime(conversation.lastMessage.createdAt)}
-                    </span>
-                  </div>
-                  <div className={styles.lastMessage}>
-                    {conversation.lastMessage?.content || '暂无消息'}
-                  </div>
-                </div>
-
-                {conversation.unreadCount > 0 && (
-                  <span className={styles.unreadBadge}>
-                    {conversation.unreadCount}
-                  </span>
-                )}
+      <div className={styles.conversationList}>
+        {conversations.map(conversation => (
+          <div 
+            key={conversation.userId}
+            className={styles.conversationItem}
+            onClick={() => handleClick(conversation)}
+          >
+            <Avatar nickname={conversation.nickname} size={48} />
+            
+            <div className={styles.conversationInfo}>
+              <div className={styles.conversationHeader}>
+                <span className={styles.nickname}>{conversation.nickname}</span>
+                <span className={styles.time}>
+                  {conversation.lastMessage && formatTime(conversation.lastMessage.createdAt)}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <div className={styles.lastMessage}>
+                {conversation.lastMessage?.content || '暂无消息'}
+              </div>
+            </div>
 
-      <TabBar />
+            {conversation.unreadCount > 0 && (
+              <span className={styles.unreadBadge}>
+                {conversation.unreadCount}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

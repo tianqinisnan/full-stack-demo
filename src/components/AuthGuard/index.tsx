@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { userStorage } from '@src/utils/storage';
 
 // 不需要登录就能访问的路由
-const PUBLIC_ROUTES = ['/login', '/verification', '/set-nickname'];
+const PUBLIC_ROUTES = ['/login'];
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   
   // 同步检查登录状态
   const isAuthenticated = userStorage.isLoggedIn();
-  
+
   if (isPublicRoute || isAuthenticated) {
     return <>{children}</>;
   }

@@ -1,5 +1,4 @@
 import React from 'react';
-import TabBar from '@src/components/TabBar';
 import styles from './style.module.css';
 
 const MePage: React.FC = () => {
@@ -9,7 +8,6 @@ const MePage: React.FC = () => {
       <div className={styles.content}>
         {/* 个人中心内容 */}
       </div>
-      <TabBar />
     </div>
   );
 };

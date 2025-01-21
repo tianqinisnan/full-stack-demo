@@ -1,44 +1,83 @@
 .container {
-  padding: 20px;
-  max-width: 400px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
+.content {
+  width: 100%;
+  max-width: 320px;
+  padding: var(--spacing-xl);
+  background-color: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .title {
+  font-size: var(--font-size-xl);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xl);
   text-align: center;
-  color: #333;
+}
+
+.phoneInfo {
+  font-size: var(--font-size-sm);
+  color: var(--text-color-secondary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
 }
 
 .input {
   width: 100%;
-  height: 44px;
-  border: 1px solid #dcdee0;
-  border-radius: 8px;
-  padding: 0 15px;
-  font-size: 16px;
-  margin-bottom: 16px;
-  box-sizing: border-box;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  transition: border-color 0.3s;
 }
 
 .input:focus {
-  border-color: #1989fa;
-  outline: none;
+  border-color: var(--primary-color);
 }
 
 .button {
   width: 100%;
-  height: 44px;
-  background-color: #1989fa;
+  padding: var(--spacing-md);
+  background-color: var(--primary-color);
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-md);
+  transition: background-color 0.3s;
 }
 
-.button:disabled {
-  background-color: #a0cfff;
-  cursor: not-allowed;
+.button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.button:active {
+  background-color: var(--primary-color-light);
+}
+
+.countdown {
+  text-align: center;
+  color: var(--text-color-light);
+  font-size: var(--font-size-sm);
+}
+
+.resend {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.resend:hover {
+  color: var(--primary-color-dark);
 }
 
 .errorMessage {
