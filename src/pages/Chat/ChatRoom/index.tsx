@@ -6,10 +6,12 @@ import { userStorage } from '@src/utils/storage';
 import { eventBus, EVENT_NAMES } from '@src/utils/eventBus';
 import Toast from '@src/components/Toast';
 import styles from './style.module.css';
+import { useHeader } from '@src/contexts/HeaderContext';
 
 const ChatRoom: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { setConfig } = useHeader();
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -17,8 +19,122 @@ const ChatRoom: React.FC = () => {
   const [selfNickname, setSelfNickname] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const phone = userStorage.getPhone() || '';
+
+  useEffect(() => {
+    // 点击外部关闭下拉菜单
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    // 配置 Header
+    setConfig({
+      title: nickname || id,
+      rightContent: (
+        <div ref={dropdownRef} style={{ position: 'relative' }}>
+          <div 
+            style={{ padding: '8px', cursor: 'pointer' }}
+            onClick={() => setShowDropdown(!showDropdown)}
+          >
+            ···
+          </div>
+          {showDropdown && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                backgroundColor: '#4A4A4A',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                minWidth: '120px',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000
+              }}
+            >
+              <div
+                onClick={handleBack}
+                style={{
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  whiteSpace: 'nowrap',
+                  backgroundColor: '#4A4A4A',
+                }}
+                onMouseEnter={e => {
+                  (e.target as HTMLDivElement).style.backgroundColor = '#5A5A5A';
+                }}
+                onMouseLeave={e => {
+                  (e.target as HTMLDivElement).style.backgroundColor = '#4A4A4A';
+                }}
+              >
+                回到聊天列表
+              </div>
+            </div>
+          )}
+        </div>
+      )
+    });
+  }, [showDropdown, nickname]);
+
+  useEffect(() => {
+    // 点击外部关闭下拉菜单
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
+
+    // 订阅新消息事件
+    const unsubscribeMessage = eventBus.subscribe(EVENT_NAMES.NEW_MESSAGE, (message) => {
+      if (message.senderId === id || message.receiverId === id) {
+        fetchMessages();
+      }
+    });
+
+    // 订阅消息已读状态事件
+    const unsubscribeRead = eventBus.subscribe(EVENT_NAMES.MESSAGE_READ, (data) => {
+      if (data.reader.phone === id) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.messageId === data.messageId
+              ? { ...msg, status: 'read' as const }
+              : msg
+          )
+        );
+      }
+    });
+
+    return () => {
+      unsubscribeMessage();
+      unsubscribeRead();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const fetchMessages = async () => {
     try {
@@ -54,45 +170,12 @@ const ChatRoom: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchMessages();
-
-    // 订阅新消息事件
-    const unsubscribeMessage = eventBus.subscribe(EVENT_NAMES.NEW_MESSAGE, (message) => {
-      if (message.senderId === id || message.receiverId === id) {
-        fetchMessages();
-      }
-    });
-
-    // 订阅消息已读状态事件
-    const unsubscribeRead = eventBus.subscribe(EVENT_NAMES.MESSAGE_READ, (data) => {
-      if (data.reader.phone === id) {
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.messageId === data.messageId
-              ? { ...msg, status: 'read' as const }
-              : msg
-          )
-        );
-      }
-    });
-
-    return () => {
-      unsubscribeMessage();
-      unsubscribeRead();
-    };
-  }, [id]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleBack = () => {
-    navigate('/chat');
+    navigate('/chat', { replace: true });
   };
 
   const handleSend = async () => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '@src/components/Header';
 import Footer from '@src/components/Footer';
+import { HeaderProvider } from '@src/contexts/HeaderContext';
 import SocketManager from '@src/components/SocketManager';
 import { routes, RouteConfig } from '@src/routes';
 import styles from './style.module.css';
@@ -29,24 +30,26 @@ const Layout: React.FC = () => {
   const currentRoute = getRouteConfig(location.pathname);
 
   return (
-    <div className={styles.layout}>
-      <SocketManager />
-      {currentRoute.header && (
-        <>
-          <Header title={currentRoute.title} />
-          <div className={styles.headerPlaceholder} />
-        </>
-      )}
-      <main className={styles.main}>
-        <Outlet />
-      </main>
-      {currentRoute.footer && (
-        <>
-          <Footer />
-          <div className={styles.footerPlaceholder} />
-        </>
-      )}
-    </div>
+    <HeaderProvider>
+      <div className={styles.layout}>
+        <SocketManager />
+        {currentRoute.header && (
+          <>
+            <Header title={currentRoute.title} showBack={!currentRoute.footer} />
+            <div className={styles.headerPlaceholder} />
+          </>
+        )}
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+        {currentRoute.footer && (
+          <>
+            <Footer />
+            <div className={styles.footerPlaceholder} />
+          </>
+        )}
+      </div>
+    </HeaderProvider>
   );
 };
 

@@ -7,6 +7,7 @@ import styles from './style.module.css';
 
 const HomePage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [nickname, setNickname] = useState<string>('');
   
   // 从 storage 获取手机号
