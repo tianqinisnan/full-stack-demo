@@ -45,10 +45,18 @@ const ChatRoom: React.FC = () => {
       rightContent: (
         <div ref={dropdownRef} style={{ position: 'relative' }}>
           <div 
-            style={{ padding: '8px', cursor: 'pointer' }}
+            style={{ 
+              padding: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
             onClick={() => setShowDropdown(!showDropdown)}
           >
-            ···
+            <svg className={styles.icon} aria-hidden="true">
+              <use xlinkHref="#icon-mti-gengduo" />
+            </svg>
           </div>
           {showDropdown && (
             <div 

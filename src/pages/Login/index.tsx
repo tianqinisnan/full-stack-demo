@@ -5,6 +5,7 @@ import { userStorage } from '@src/utils/storage';
 import { VerificationInput } from '@src/components/VerificationInput';
 import Toast from '@src/components/Toast';
 import styles from './style.module.css';
+import SliderCaptcha from '@src/components/SliderCaptcha';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Login: React.FC = () => {
   const [code, setCode] = useState('');
   const [isVerification, setIsVerification] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [showCaptcha, setShowCaptcha] = useState(false);
 
   const handleSendCode = async () => {
     if (!phone.trim() || !/^1[3-9]\d{9}$/.test(phone)) {
@@ -19,12 +21,18 @@ const Login: React.FC = () => {
       return;
     }
 
+    // 显示滑块验证
+    setShowCaptcha(true);
+  };
+
+  const handleCaptchaSuccess = async () => {
+    setShowCaptcha(false);
+    // 验证成功后发送验证码
     try {
       const response = await apiService.sendVerificationCode(phone);
       if (response.success) {
         Toast.show('验证码已发送');
         setIsVerification(true);
-        // 开始倒计时
         setCountdown(60);
         const timer = setInterval(() => {
           setCountdown(prev => {
@@ -130,6 +138,13 @@ const Login: React.FC = () => {
           </>
         )}
       </div>
+      
+      {showCaptcha && (
+        <SliderCaptcha
+          onSuccess={handleCaptchaSuccess}
+          onClose={() => setShowCaptcha(false)}
+        />
+      )}
     </div>
   );
 };

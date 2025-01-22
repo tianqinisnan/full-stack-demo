@@ -109,4 +109,11 @@
 .sendButton:disabled {
   background-color: #9fd7b3;
   cursor: not-allowed;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: #666;
+  vertical-align: middle;
 } 
