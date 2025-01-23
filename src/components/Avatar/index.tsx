@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './style.module.css';
+import { getFullUrl } from '@src/utils/url';
 
 interface AvatarProps {
   nickname: string;
@@ -7,14 +8,14 @@ interface AvatarProps {
   size?: number;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ nickname = '', avatarUrl, size = 40 }) => {
+const Avatar: React.FC<AvatarProps> = ({ nickname = '用户', avatarUrl, size = 40 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // 如果有头像 URL，直接显示图片
   if (avatarUrl) {
     return (
       <img
-        src={avatarUrl}
+        src={getFullUrl(avatarUrl)}
         alt={nickname}
         className={styles.avatar}
         style={{ width: size, height: size }}

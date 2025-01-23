@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '@src/services/api';
 import { buildQuery } from '@src/types/route';
-import { userStorage } from '@src/utils/storage';
 import styles from './style.module.css';
 
 const SetNicknamePage: React.FC = () => {
@@ -11,8 +10,6 @@ const SetNicknamePage: React.FC = () => {
   const { defaultNickname } = location.state || {};
   const [nickname, setNickname] = useState(defaultNickname || '');
   const [error, setError] = useState('');
-
-  const phone = userStorage.getPhone() || '';
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
@@ -26,7 +23,7 @@ const SetNicknamePage: React.FC = () => {
     }
 
     try {
-      await apiService.updateNickname(phone, nickname);
+      await apiService.updateNickname(nickname);
       const query = buildQuery({ nickname });
       navigate(`/home?${query}`);
     } catch (err) {

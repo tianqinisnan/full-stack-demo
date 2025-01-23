@@ -5,3 +5,6 @@ node_modules
 # MongoDB
 mongodb/data/
 mongodb/log/
+
+#server
+server/public/

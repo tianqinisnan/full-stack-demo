@@ -8,8 +8,10 @@ import { verificationRoutes } from './routes/verification';
 import { eventRoutes } from './routes/event';
 import { userRoutes } from './routes/user';
 import { chatRoutes } from './routes/chat';
+import { uploadRoutes } from './routes/upload';
 import { env } from './config/env';
 import { initializeWebSocket } from './services/websocket';
+import path from 'path';
 
 // 连接数据库
 connectDB().catch(err => {
@@ -33,11 +35,15 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 
+// 静态文件服务
+app.use(express.static(path.join(process.cwd(), 'public')));
+
 // 路由
 app.use('/api/verification', verificationRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 错误处理中间件
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

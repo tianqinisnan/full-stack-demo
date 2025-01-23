@@ -2,16 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '@src/services/api';
 import { parseQuery } from '@src/types/route';
-import { userStorage } from '@src/utils/storage';
 import styles from './style.module.css';
 
 const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [nickname, setNickname] = useState<string>('');
-  
-  // 从 storage 获取手机号
-  const phone = userStorage.getPhone() || '';
   
   // 从 URL 获取可分享信息
   const query = parseQuery(location.search);
@@ -27,7 +23,7 @@ const HomePage: React.FC = () => {
     // 获取用户信息
     const fetchUserInfo = async () => {
       try {
-        const response = await apiService.getUserInfo(phone);
+        const response = await apiService.getUserInfo();
         if (response.data) {
           setNickname(response.data.nickname);
         }
@@ -37,7 +33,7 @@ const HomePage: React.FC = () => {
     };
 
     fetchUserInfo();
-  }, [phone, urlNickname]);
+  }, [urlNickname]);
 
   // 生成分享链接
   const shareUrl = `${window.location.origin}/home?nickname=${encodeURIComponent(nickname)}`;

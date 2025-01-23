@@ -9,6 +9,7 @@ export interface IUser extends mongoose.Document {
   avatarUrl?: string;
   status: 'active' | 'inactive' | 'blocked';
   lastLoginAt?: Date;
+  historyId?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,10 +46,19 @@ const userSchema = new mongoose.Schema({
   },
   lastLoginAt: {
     type: Date
+  },
+  historyId: {
+    type: Number
   }
 }, {
   timestamps: true, // 自动管理 createdAt 和 updatedAt
   collection: 'users_info' // 指定集合名称
+});
+
+// 更新时自动更新 updatedAt 字段
+userSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
 });
 
 // 创建并导出用户模型

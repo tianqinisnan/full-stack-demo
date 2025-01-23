@@ -83,7 +83,7 @@ const ChatPage: React.FC = () => {
             className={styles.conversationItem}
             onClick={() => handleClick(conversation)}
           >
-            <Avatar nickname={conversation.nickname} size={48} />
+            <Avatar nickname={conversation.nickname} avatarUrl={conversation.avatarUrl} size={48} />
             
             <div className={styles.conversationInfo}>
               <div className={styles.conversationHeader}>

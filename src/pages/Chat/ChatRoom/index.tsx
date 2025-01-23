@@ -16,7 +16,9 @@ const ChatRoom: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [nickname, setNickname] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [selfNickname, setSelfNickname] = useState('');
+  const [selfAvatarUrl, setSelfAvatarUrl] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -164,12 +166,14 @@ const ChatRoom: React.FC = () => {
       const userResponse = await apiService.getUserInfo(id);
       if (userResponse.success && userResponse.data) {
         setNickname(userResponse.data.nickname);
+        setAvatarUrl(userResponse.data.avatarUrl);
       }
 
       // 获取自己的用户信息
-      const selfResponse = await apiService.getUserInfo(phone);
+      const selfResponse = await apiService.getUserInfo();
       if (selfResponse.success && selfResponse.data) {
         setSelfNickname(selfResponse.data.nickname);
+        setSelfAvatarUrl(selfResponse.data.avatarUrl);
       }
     } catch (error) {
       console.error('获取消息失败:', error);
@@ -261,8 +265,8 @@ const ChatRoom: React.FC = () => {
                   key={message.messageId}
                   className={`${styles.messageItem} ${isSelf ? styles.self : ''}`}
                 >
-                  {!isSelf && <Avatar nickname={nickname} size={40} />}
-                  {isSelf && <Avatar nickname={selfNickname} size={40} />}
+                  {!isSelf && <Avatar nickname={nickname} size={40} avatarUrl={avatarUrl} />}
+                  {isSelf && <Avatar nickname={selfNickname} size={40} avatarUrl={selfAvatarUrl} />}
                   <div className={styles.messageContent}>
                     <div className={styles.messageText}>{message.content}</div>
                     <div className={styles.messageTime}>

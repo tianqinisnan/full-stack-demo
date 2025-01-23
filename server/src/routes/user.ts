@@ -1,5 +1,5 @@
 import express from 'express';
-import { updateNickname, getUserInfo, getAllUsers } from '../controllers/user';
+import { updateNickname, updateAvatar, getUserInfo, getAllUsers } from '../controllers/user';
 import { auth } from '../middleware/auth';
 
 const router = express.Router();
@@ -8,6 +8,7 @@ const router = express.Router();
 router.use(auth);
 
 router.post('/update-nickname', updateNickname);
+router.post('/update-avatar', updateAvatar);
 router.get('/info', getUserInfo);
 router.get('/all', getAllUsers);
 

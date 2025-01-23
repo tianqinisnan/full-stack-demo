@@ -96,16 +96,24 @@ class ApiService {
   }
 
   // 更新昵称
-  async updateNickname(phone: string, nickname: string): Promise<ApiResponse> {
+  async updateNickname(nickname: string): Promise<ApiResponse> {
     return this.request('/api/users/update-nickname', {
       method: 'POST',
-      body: JSON.stringify({ phone, nickname }),
+      body: JSON.stringify({ nickname }),
+    });
+  }
+
+  // 更新头像
+  async updateAvatar(avatarUrl: string): Promise<ApiResponse> {
+    return this.request('/api/users/update-avatar', {
+      method: 'POST',
+      body: JSON.stringify({ avatarUrl }),
     });
   }
 
   // 获取用户信息
-  async getUserInfo(phone: string): Promise<ApiResponse<{ nickname: string }>> {
-    return this.request(`/api/users/info?phone=${encodeURIComponent(phone)}`, {
+  async getUserInfo(phone?: string): Promise<ApiResponse<{ nickname: string, avatarUrl: string }>> {
+    return this.request(`/api/users/info?phone=${encodeURIComponent(phone || '')}`, {
       method: 'GET',
     });
   }
@@ -155,6 +163,29 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ partnerId }),
     });
+  }
+
+  // 上传图片
+  async uploadImage(file: File): Promise<ApiResponse<{ url: string }>> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`${this.baseURL}/api/upload/image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || '上传失败');
+      }
+
+      return data;
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('上传失败');
+    }
   }
 }
 
