@@ -32,6 +32,7 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ defaultAvatar, onAvatar
       reader.onload = () => {
         setSelectedImage(reader.result as string);
         setShowCropModal(true);
+        event.target.value = '';
       };
       reader.readAsDataURL(file);
     }
@@ -70,14 +71,16 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ defaultAvatar, onAvatar
     });
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    try {
-      const response = await apiService.uploadImage(file);
-      return response.data?.url || '';
-    } catch (error) {
-      console.error('Upload error:', error);
-      throw new Error('上传失败');
-    }
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget;
+    const size = Math.min(width, height);
+    setCrop({
+      unit: 'px',
+      x: 0,
+      y: 0,
+      width: size,
+      height: size
+    });
   };
 
   const handleCropComplete = async () => {
@@ -90,17 +93,20 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ defaultAvatar, onAvatar
         const croppedUrl = URL.createObjectURL(croppedBlob);
         setPreview(croppedUrl);
         
-        // Convert blob to File
         const croppedFile = new File([croppedBlob], 'avatar.jpg', {
           type: 'image/jpeg'
         });
         
-        // 上传图片并获取URL
-        const uploadedUrl = await uploadImage(croppedFile);
-        onAvatarChange?.(uploadedUrl);
-        setShowCropModal(false);
+        const uploadedUrl = await apiService.uploadImage(croppedFile);
+        if (uploadedUrl.data?.url) {
+          onAvatarChange?.(uploadedUrl.data.url);
+          setShowCropModal(false);
+        } else {
+          throw new Error('上传失败：未获取到图片URL');
+        }
       } catch (e) {
         console.error('Error cropping/uploading image:', e);
+        Toast.show('上传失败，请重试');
       }
     }
   };
@@ -139,6 +145,7 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ defaultAvatar, onAvatar
                   src={selectedImage}
                   alt="Crop"
                   className={styles.cropImage}
+                  onLoad={onImageLoad}
                 />
               </ReactCrop>
             </div>
