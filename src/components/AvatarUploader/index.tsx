@@ -128,6 +128,11 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ defaultAvatar, onAvatar
             上传头像
           </div>
         )}
+        <div className={styles.cameraIcon}>
+          <svg className="icon" aria-hidden="true">
+            <use xlinkHref="#icon-a-shapecamerapressedfalse" />
+          </svg>
+        </div>
       </div>
 
       {showCropModal && (

@@ -29,6 +29,13 @@ export const updateNickname = async (req: Request, res: Response) => {
       });
     }
 
+    // 如果新昵称与当前昵称相同，直接返回成功
+    if (user.nickname === nickname) {
+      return res.json({
+        success: true
+      });
+    }
+
     // 处理历史记录
     let history;
     if (user.historyId) {

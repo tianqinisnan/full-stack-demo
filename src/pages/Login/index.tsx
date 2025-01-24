@@ -71,10 +71,11 @@ const Login: React.FC = () => {
         if (isNewUser) {
           // 如果是新用户，跳转到设置昵称页面
           const defaultNickname = `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+          apiService.updateNickname(defaultNickname);
           navigate('/set-nickname', { state: { defaultNickname } });
         } else {
           // 如果是老用户，直接跳转到首页
-          navigate('/home');
+          navigate(`/home?${nickname}`);
         }
       }
     } catch (error) {
